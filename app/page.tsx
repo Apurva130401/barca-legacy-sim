@@ -45,7 +45,8 @@ type Player = {
   goals?: number;
 };
 
-type Stage = "welcome" | "budget" | "flick" | "squad" | "market" | "formation" | "season" | "results" | "trophies";
+type Stage = "welcome" | "marketSetup" | "budget" | "flick" | "squad" | "market" | "formation" | "season" | "results" | "trophies";
+type NegotiationDifficulty = "hard" | "normal" | "easy";
 type Offer = { club: string; fee: number; wageContribution?: number; type: "sale" | "loan" };
 type Contract = { transferFee: number; wage: number; years: number; bonus: number; releaseClause: number };
 type SlotLine = "GK" | "Defense" | "Midfield" | "Forward";
@@ -169,9 +170,40 @@ const newsTone = [
   "Fake Twitter meltdown"
 ];
 
+const negotiationProfiles: Record<NegotiationDifficulty, { label: string; description: string; appealBonus: number; clubAcceptanceBonus: number; hijackMultiplier: number; marqueePenalty: number; rivalryMultiplier: number }> = {
+  hard: {
+    label: "Hard",
+    description: "Marquee players demand a convincing project, elite clubs hold firm, and rival hijacks are brutal.",
+    appealBonus: -10,
+    clubAcceptanceBonus: -18,
+    hijackMultiplier: 1.35,
+    marqueePenalty: 16,
+    rivalryMultiplier: 1.2
+  },
+  normal: {
+    label: "Normal",
+    description: "A balanced market: some stars can be tempted, but clubs and agents still punish messy offers.",
+    appealBonus: 0,
+    clubAcceptanceBonus: 0,
+    hijackMultiplier: 1,
+    marqueePenalty: 7,
+    rivalryMultiplier: 1
+  },
+  easy: {
+    label: "Easy",
+    description: "Barça pull is strong, clubs are more flexible, and players are easier to lure with good wages.",
+    appealBonus: 15,
+    clubAcceptanceBonus: 20,
+    hijackMultiplier: 0.55,
+    marqueePenalty: 0,
+    rivalryMultiplier: 0.75
+  }
+};
+
 export default function Home() {
   const [stage, setStage] = useState<Stage>("welcome");
   const [director, setDirector] = useState("");
+  const [negotiationDifficulty, setNegotiationDifficulty] = useState<NegotiationDifficulty>("normal");
   const [budget, setBudget] = useState(65000000);
   const [cash, setCash] = useState(65000000);
   const [squad, setSquad] = useState<Player[]>(initialSquad);
@@ -202,6 +234,7 @@ export default function Home() {
       const saved = JSON.parse(raw);
       setStage(saved.stage ?? "welcome");
       setDirector(saved.director ?? "");
+      setNegotiationDifficulty(saved.negotiationDifficulty ?? "normal");
       setBudget(saved.budget ?? 65000000);
       setCash(saved.cash ?? 65000000);
       setSquad(saved.squad ?? initialSquad);
@@ -221,9 +254,9 @@ export default function Home() {
   useEffect(() => {
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ stage, director, budget, cash, squad, formation, slotAssignments, xi, bench, monthIndex, seasonLog, result, trophies })
+      JSON.stringify({ stage, director, negotiationDifficulty, budget, cash, squad, formation, slotAssignments, xi, bench, monthIndex, seasonLog, result, trophies })
     );
-  }, [stage, director, budget, cash, squad, formation, slotAssignments, xi, bench, monthIndex, seasonLog, result, trophies]);
+  }, [stage, director, negotiationDifficulty, budget, cash, squad, formation, slotAssignments, xi, bench, monthIndex, seasonLog, result, trophies]);
 
   useEffect(() => {
     setXi(Object.values(slotAssignments).filter(Boolean));
@@ -237,6 +270,7 @@ export default function Home() {
   const ffpRisk = clamp(Math.round((wageBill / ffpLimit) * 100));
   const registeredCount = activeSquad.filter((p) => p.registered).length;
   const currentSlots = formationSlots[formation] ?? formationSlots["4-3-3"];
+  const negotiationProfile = negotiationProfiles[negotiationDifficulty];
   const ballonDorLine =
     result && (result.trophies.includes("UEFA Champions League") || result.trophies.includes("La Liga")) && result.fanHappiness >= 78
       ? "Ballon d'Or winner: Lamine Yamal after delivering an actual trophy season, not just elite edits."
@@ -310,17 +344,17 @@ export default function Home() {
     const competitor = clubsSeed[Math.floor(Math.random() * clubsSeed.length)];
     const wagePremium = contract.wage / Math.max(1, contractTarget.wage);
     const registrationPenalty = wageBill + contract.wage > ffpLimit ? 30 : 0;
-    const rivalryPenalty = isRealMadrid ? 75 : contractTarget.club === "Atletico Madrid" ? 18 : 0;
+    const rivalryPenalty = (isRealMadrid ? 75 : contractTarget.club === "Atletico Madrid" ? 18 : 0) * negotiationProfile.rivalryMultiplier;
     const projectBonus = contractTarget.age <= 23 ? 6 : contractTarget.age >= 31 ? -4 : 0;
-    const starPenalty = contractTarget.rating >= 88 ? 16 : contractTarget.rating >= 85 ? 8 : 0;
+    const starPenalty = contractTarget.rating >= 88 ? negotiationProfile.marqueePenalty : contractTarget.rating >= 85 ? Math.round(negotiationProfile.marqueePenalty * 0.55) : 0;
     const levelPenalty = contractTarget.level === "World superstar" ? 12 : contractTarget.level === "Elite UCL" ? 7 : 0;
     const loyaltyPenalty = (contractTarget.loyalty ?? 50) * 0.42;
     const releaseClauseBonus = contract.releaseClause > contractTarget.value * 2.4 ? 5 : -4;
     const wageScore = wagePremium >= 1.45 ? 24 : wagePremium >= 1.22 ? 15 : wagePremium >= 1.08 ? 7 : -12;
     const clubOfferRatio = transferCost / Math.max(1, askingPrice);
-    const clubAcceptance = clubOfferRatio >= 1 ? 100 : clubOfferRatio >= 0.9 ? 72 : clubOfferRatio >= 0.8 ? 38 : clubOfferRatio >= 0.7 ? 16 : 0;
+    const clubAcceptance = clamp((clubOfferRatio >= 1 ? 100 : clubOfferRatio >= 0.9 ? 72 : clubOfferRatio >= 0.8 ? 38 : clubOfferRatio >= 0.7 ? 16 : 0) + negotiationProfile.clubAcceptanceBonus);
     const cashPenalty = cash >= transferCost + contract.bonus ? 0 : 35;
-    const appeal = 56 + wageScore + projectBonus + releaseClauseBonus - registrationPenalty - rivalryPenalty - starPenalty - levelPenalty - loyaltyPenalty - cashPenalty + Math.random() * 18;
+    const appeal = 56 + negotiationProfile.appealBonus + wageScore + projectBonus + releaseClauseBonus - registrationPenalty - rivalryPenalty - starPenalty - levelPenalty - loyaltyPenalty - cashPenalty + Math.random() * 18;
     if (transferCost > cash || cash < transferCost + contract.bonus) {
       pushNews(`The ${contractTarget.name} deal collapses. Your offer cannot exceed the available transfer budget.`);
       setContractTarget(null);
@@ -331,7 +365,7 @@ export default function Home() {
       setContractTarget(null);
       return;
     }
-    if (isRealMadrid && Math.random() < 0.92) {
+    if (isRealMadrid && Math.random() < (negotiationDifficulty === "easy" ? 0.72 : negotiationDifficulty === "normal" ? 0.88 : 0.96)) {
       pushNews(`${contractTarget.name} refuses to cross the Clasico border. The agent did not even let you finish the sentence.`);
       setContractTarget(null);
       return;
@@ -342,7 +376,7 @@ export default function Home() {
       setContractTarget(null);
       return;
     }
-    const hijackChance = contractTarget.rating >= 86 ? 0.36 : contractTarget.potential && contractTarget.potential >= 88 ? 0.28 : 0.14;
+    const hijackChance = clamp((contractTarget.rating >= 86 ? 0.36 : contractTarget.potential && contractTarget.potential >= 88 ? 0.28 : 0.14) * negotiationProfile.hijackMultiplier, 0, 0.72);
     if (Math.random() < hijackChance) {
       pushNews(`${competitor.name} hijacks the ${contractTarget.name} deal with cleaner wages and fewer PDF rituals.`);
       setContractTarget(null);
@@ -483,7 +517,7 @@ export default function Home() {
                   <p className="mt-4 max-w-2xl text-slate-300">Hansi Flick wants signings, La Liga wants paperwork, fans want trophies, and the wage bill is sitting in your office wearing sunglasses.</p>
                   <div className="mt-6 flex max-w-md flex-col gap-3 sm:flex-row">
                     <input className="rounded-lg border border-white/15 bg-black/45 px-4 py-3 outline-none focus:border-barcaGold" placeholder="Director name" value={director} onChange={(e) => setDirector(e.target.value)} />
-                    <button className="rounded-lg bg-barcaGold px-5 py-3 font-black text-night" onClick={() => setStage("budget")} disabled={!director.trim()}>Take the job</button>
+                    <button className="rounded-lg bg-barcaGold px-5 py-3 font-black text-night" onClick={() => setStage("marketSetup")} disabled={!director.trim()}>Take the job</button>
                   </div>
                 </div>
                 <Panel title="Financial Crisis Briefing" icon={<ClipboardList />}>
@@ -493,6 +527,36 @@ export default function Home() {
                   <Info label="Fan patience" value="Depends on the next winger" />
                 </Panel>
               </div>
+            </Screen>
+          )}
+
+          {stage === "marketSetup" && (
+            <Screen key="marketSetup">
+              <Panel title="Transfer Market Difficulty" icon={<Gavel />}>
+                <div className="grid gap-4 md:grid-cols-3">
+                  {(Object.keys(negotiationProfiles) as NegotiationDifficulty[]).map((level) => {
+                    const profile = negotiationProfiles[level];
+                    const selected = negotiationDifficulty === level;
+                    return (
+                      <button
+                        key={level}
+                        className={`rounded-lg border p-5 text-left transition ${selected ? "border-barcaGold bg-barcaGold/15 shadow-glow" : "border-white/10 bg-black/30 hover:border-barcaGold/60 hover:bg-white/10"}`}
+                        onClick={() => setNegotiationDifficulty(level)}
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <h3 className="text-2xl font-black">{profile.label}</h3>
+                          <span className={`rounded-full px-3 py-1 text-xs font-black ${selected ? "bg-barcaGold text-night" : "bg-white/10 text-slate-300"}`}>{selected ? "Selected" : "Choose"}</span>
+                        </div>
+                        <p className="mt-3 text-sm text-slate-300">{profile.description}</p>
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="mt-5 rounded-lg border border-white/10 bg-black/30 p-4 text-sm text-slate-300">
+                  Current mode: <b className="text-barcaGold">{negotiationProfile.label}</b>. This changes real transfer behavior: club acceptance, player appeal, marquee-player reluctance, rivalry resistance, and hijack odds.
+                </div>
+                <button className="mt-5 rounded-lg bg-barcaGold px-5 py-3 font-black text-night" onClick={() => setStage("budget")}>Continue to Budget</button>
+              </Panel>
             </Screen>
           )}
 
@@ -559,6 +623,9 @@ export default function Home() {
           {stage === "market" && (
             <Screen key="market">
               <Panel title="Transfer Market" icon={<Search />}>
+                <div className="mb-4 rounded-lg border border-white/10 bg-black/30 p-3 text-sm text-slate-300">
+                  Negotiation mode: <b className="text-barcaGold">{negotiationProfile.label}</b> | {negotiationProfile.description}
+                </div>
                 <div className="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center">
                   <div className="grid flex-1 gap-3 lg:grid-cols-4">
                   <input className="rounded-lg border border-white/10 bg-black/40 px-3 py-2 lg:col-span-2" placeholder="Search players" value={query} onChange={(e) => setQuery(e.target.value)} />
