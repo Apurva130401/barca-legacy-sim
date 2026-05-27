@@ -779,6 +779,10 @@ export default function Home() {
                   <button className="rounded-lg bg-emerald-500 px-5 py-3 font-black text-night shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400" onClick={restart}>Play Again</button>
                   <button className="rounded-lg border border-white/15 px-5 py-3 font-black" onClick={restart}>New save</button>
                 </div>
+                <div className="mt-6 flex flex-col gap-3 rounded-lg border border-barcaGold/30 bg-barcaGold/10 p-4 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-sm font-bold text-slate-100">Enjoyed surviving the Barça spreadsheet?</p>
+                  <a className="inline-flex min-h-[48px] items-center justify-center rounded-lg bg-barcaGold px-6 py-3 text-center font-black text-night shadow-lg shadow-barcaGold/20 transition hover:-translate-y-0.5 hover:bg-yellow-300" href="https://buymeacoffee.com/apurvamishra" target="_blank" rel="noreferrer">Buy Me a Coffee</a>
+                </div>
               </Panel>
             </Screen>
           )}
