@@ -134,7 +134,24 @@ const clamp = (n: number, min = 0, max = 100) => Math.max(min, Math.min(max, n))
 const seeded = (n: number) => Math.abs(Math.sin(n * 9301 + 49297) * 233280) % 1;
 
 function buildMarket(): Player[] {
-  return playerDb.players.map((p, index) => ({
+  const compactPlayers = (playerDb.compactPlayers ?? []).map((row: string) => {
+    const [id, name, club, nationality, age, position, rating, potential, value, wage, loyalty, level] = row.split("|");
+    return {
+      id,
+      name,
+      club,
+      nationality,
+      age: Number(age),
+      position,
+      rating: Number(rating),
+      potential: Number(potential),
+      value: Number(value),
+      wage: Number(wage),
+      loyalty: Number(loyalty),
+      level
+    };
+  });
+  return [...playerDb.players, ...compactPlayers].map((p, index) => ({
     ...p,
     id: `market-${p.id}`,
     morale: 58 + Math.floor(seeded(index + 13) * 35),
@@ -555,7 +572,10 @@ export default function Home() {
                     {[21,24,28,32,40].map((v) => <option key={v} value={v}>Age under {v}</option>)}
                   </select>
                   </div>
-                  <button className="rounded-lg bg-emerald-500 px-5 py-3 font-black text-night shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400" onClick={() => setStage("formation")}>Next -&gt; Formation</button>
+                  <div className="flex flex-col gap-2 sm:flex-row xl:flex-col">
+                    <button className="rounded-lg border border-emerald-400/50 px-5 py-3 font-black text-emerald-100 transition hover:border-emerald-300 hover:bg-emerald-500/15" onClick={() => setStage("squad")}>Back -&gt; Sell</button>
+                    <button className="rounded-lg bg-emerald-500 px-5 py-3 font-black text-night shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400" onClick={() => setStage("formation")}>Next -&gt; Formation</button>
+                  </div>
                 </div>
                 <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                   {filteredMarket.map((p) => (
@@ -577,7 +597,10 @@ export default function Home() {
                     </motion.div>
                   ))}
                 </div>
-                <button className="mt-5 rounded-lg bg-emerald-500 px-5 py-3 font-black text-night shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400" onClick={() => setStage("formation")}>Next -&gt; Formation</button>
+                <div className="mt-5 flex flex-wrap gap-3">
+                  <button className="rounded-lg border border-emerald-400/50 px-5 py-3 font-black text-emerald-100 transition hover:border-emerald-300 hover:bg-emerald-500/15" onClick={() => setStage("squad")}>Back -&gt; Sell</button>
+                  <button className="rounded-lg bg-emerald-500 px-5 py-3 font-black text-night shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400" onClick={() => setStage("formation")}>Next -&gt; Formation</button>
+                </div>
               </Panel>
             </Screen>
           )}
