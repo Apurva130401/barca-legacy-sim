@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 12% 12%, rgba(165, 0, 68, .32), transparent 28rem),
+    radial-gradient(circle at 84% 6%, rgba(0, 77, 152, .35), transparent 30rem),
+    linear-gradient(135deg, rgba(5, 8, 20, .96), rgba(9, 13, 30, .98)),
+    url("https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=1800&q=80");
+  background-blend-mode: screen, screen, multiply, normal;
+  background-attachment: fixed;
+  color: #f8fafc;
+}
+
+button, input, select {
+  font: inherit;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: .55;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(237, 187, 0, .28);
+  border-radius: 999px;
+}
+
+.glass {
+  background: linear-gradient(145deg, rgba(8, 12, 28, .86), rgba(7, 11, 24, .72));
+  border: 1px solid rgba(255, 255, 255, .1);
+  backdrop-filter: blur(18px);
+}
+
+.pitch-lines {
+  background:
+    linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(0,77,152,.18), rgba(165,0,68,.14));
+  background-size: 44px 44px, 44px 44px, 100% 100%;
+}
+
+.noise {
+  position: relative;
+}
+
+.noise::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  opacity: .18;
+  background-image: linear-gradient(115deg, transparent 0 48%, rgba(255,255,255,.08) 50%, transparent 52% 100%);
+  background-size: 18px 18px;
+  mix-blend-mode: overlay;
+}
