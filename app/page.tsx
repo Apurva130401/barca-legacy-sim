@@ -698,6 +698,7 @@ export default function Home() {
                   </div>
                 </Panel>
                 <Panel title={`Assigned XI (${assignedXi.length}/11) & Bench (${bench.length}/7)`} icon={<Users />}>
+                  <button className="mb-4 rounded-lg border border-emerald-400/50 px-5 py-3 font-black text-emerald-100 transition hover:border-emerald-300 hover:bg-emerald-500/15" onClick={() => setStage("market")}>Back -&gt; Transfer Market</button>
                   <div className="mb-4 rounded-lg border border-white/10 bg-black/30 p-4 text-sm text-slate-300">
                     Click a position on the pitch to choose from eligible players only: GK, defenders, midfielders, or forwards.
                   </div>
