@@ -21,5 +21,6 @@
   {"id":"lamine","name":"Lamine Yamal","age":18,"position":"RW","rating":90,"wage":90000,"value":160000000,"morale":94,"injury":"Fit","nationality":"Spain"},
   {"id":"raphinha","name":"Raphinha","age":29,"position":"RW","rating":86,"wage":240000,"value":65000000,"morale":82,"injury":"Fit","nationality":"Brazil"},
   {"id":"rashford","name":"Marcus Rashford","age":28,"position":"LW","rating":82,"wage":240000,"value":45000000,"morale":72,"injury":"Fit","nationality":"England"},
+  {"id":"anthony-gordon","name":"Anthony Gordon","age":24,"position":"LW","rating":83,"wage":125000,"value":65000000,"morale":86,"injury":"Fit","nationality":"England"},
   {"id":"roony-bardghji","name":"Roony Bardghji","age":20,"position":"RW","rating":77,"wage":35000,"value":22000000,"morale":79,"injury":"Fit","nationality":"Sweden"}
 ]

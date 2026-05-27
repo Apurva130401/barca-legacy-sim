@@ -135,7 +135,6 @@
     {"id":"romero","name":"Cristian Romero","club":"Tottenham Hotspur","nationality":"Argentina","age":27,"position":"CB","rating":86,"potential":87,"value":70000000,"wage":185000,"loyalty":68,"level":"Elite UCL"},
     {"id":"udogie","name":"Destiny Udogie","club":"Tottenham Hotspur","nationality":"Italy","age":23,"position":"LB","rating":82,"potential":87,"value":50000000,"wage":95000,"loyalty":48,"level":"Wonderkid project"},
     {"id":"joelinton","name":"Joelinton","club":"Newcastle United","nationality":"Brazil","age":29,"position":"CM","rating":82,"potential":82,"value":35000000,"wage":130000,"loyalty":58,"level":"Europa League"},
-    {"id":"gordon","name":"Anthony Gordon","club":"Newcastle United","nationality":"England","age":24,"position":"LW","rating":83,"potential":86,"value":65000000,"wage":125000,"loyalty":56,"level":"Champions League"},
     {"id":"bowen","name":"Jarrod Bowen","club":"West Ham United","nationality":"England","age":29,"position":"RW","rating":83,"potential":83,"value":45000000,"wage":130000,"loyalty":62,"level":"Europa League"},
     {"id":"semenyo","name":"Antoine Semenyo","club":"Bournemouth","nationality":"Ghana","age":26,"position":"RW","rating":80,"potential":82,"value":30000000,"wage":75000,"loyalty":36,"level":"Europa League"},
     {"id":"kerkez-real","name":"Milos Kerkez","club":"Liverpool","nationality":"Hungary","age":22,"position":"LB","rating":80,"potential":86,"value":42000000,"wage":90000,"loyalty":56,"level":"Wonderkid project"},

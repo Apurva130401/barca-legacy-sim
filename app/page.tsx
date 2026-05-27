@@ -64,7 +64,7 @@ type SeasonResult = {
   log: string[];
 };
 
-const STORAGE_KEY = "barca-sd-sim-v2";
+const STORAGE_KEY = "barca-sd-sim-v3";
 const ffpLimit = 2820000;
 const formations = ["4-3-3", "4-2-3-1", "3-4-3", "4-4-2 Diamond"];
 const formationSlots: Record<string, FormationSlot[]> = {
@@ -216,6 +216,7 @@ export default function Home() {
   const [contractTarget, setContractTarget] = useState<Player | null>(null);
   const [contract, setContract] = useState<Contract>({ transferFee: 30000000, wage: 110000, years: 4, bonus: 5000000, releaseClause: 120000000 });
   const [toast, setToast] = useState<string | null>(null);
+  const [showGordonCelebration, setShowGordonCelebration] = useState(false);
   const [headline, setHeadline] = useState<string | null>("Barcelona appoints you as Sporting Director. Accountants seen stretching.");
   const [formation, setFormation] = useState("4-3-3");
   const [slotAssignments, setSlotAssignments] = useState<Record<string, string>>({});
@@ -228,6 +229,7 @@ export default function Home() {
   const [trophies, setTrophies] = useState({ ucl: 5, liga: 27, copa: 31 });
 
   useEffect(() => {
+    setShowGordonCelebration(true);
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return;
     try {
@@ -483,6 +485,20 @@ export default function Home() {
         {toast && (
           <motion.div initial={{ opacity: 0, y: -24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -24 }} className="fixed left-1/2 top-5 z-50 w-[min(92vw,680px)] -translate-x-1/2 rounded-lg border border-barcaGold/40 bg-night/95 p-4 shadow-glow">
             <div className="flex items-center gap-3 text-sm font-semibold"><Flame className="h-5 w-5 text-barcaGold" /> {toast}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showGordonCelebration && (
+          <motion.div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.div initial={{ scale: .9, y: 24 }} animate={{ scale: 1, y: 0 }} exit={{ scale: .9, y: 24 }} className="glass w-[min(92vw,560px)] rounded-lg border-barcaGold/40 p-6 text-center shadow-glow">
+              <Sparkles className="mx-auto h-10 w-10 text-barcaGold" />
+              <p className="mt-3 text-sm uppercase tracking-[.3em] text-barcaGold">Official signing</p>
+              <h2 className="mt-3 text-4xl font-black">Anthony Gordon is in the Barça squad</h2>
+              <p className="mt-3 text-slate-300">The left wing just got louder. Fans are already refreshing compilations and pretending they knew the flight number.</p>
+              <button className="mt-6 rounded-lg bg-barcaGold px-5 py-3 font-black text-night" onClick={() => setShowGordonCelebration(false)}>Vamos</button>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
