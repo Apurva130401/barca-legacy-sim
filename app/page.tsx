@@ -63,7 +63,7 @@ type SeasonResult = {
   log: string[];
 };
 
-const STORAGE_KEY = "barca-sd-sim-v1";
+const STORAGE_KEY = "barca-sd-sim-v2";
 const ffpLimit = 2820000;
 const formations = ["4-3-3", "4-2-3-1", "3-4-3", "4-4-2 Diamond"];
 const formationSlots: Record<string, FormationSlot[]> = {
